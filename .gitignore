@@ -1,0 +1,10 @@
+## Ignore %AppData%
+%AppData%/
+## Ignore venv/
+venv/
+## Ignore .idea/
+.idea/
+## Ignore __pycache__/
+__pycache__/
+## Ignore .SECRET
+.SECRET
