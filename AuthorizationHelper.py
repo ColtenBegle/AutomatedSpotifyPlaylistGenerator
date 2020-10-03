@@ -6,7 +6,8 @@ import webbrowser
 import os
 import re
 from requests.exceptions import HTTPError
-# C:/Users/Colten Begle/PycharmProjects/AutomatedSpotifyPlaylistGenerator/
+# sites.google.com/view/beglebocolten/home
+
 
 def get_client_id():
     reader = open("%AppData%/.SECRET")
@@ -27,7 +28,7 @@ class AuthorizationHelper:
 
     def authorize(self):
         self.client_id = get_client_id()
-        self.redirect_uri = "https://sites.google.com/view/beglebocolten/home"
+        self.redirect_uri = "https://localhost/"
         self.code_verifier = self.get_code_verifier()
         self.code_challenge = self.get_code_challenge()
         self.state = self.get_state()

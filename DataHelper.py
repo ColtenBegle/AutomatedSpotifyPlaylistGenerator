@@ -12,7 +12,7 @@ def store_access_token(access_token):
                        f"{access_token.refresh_token}; {access_token.scope}\n"
                 with open("%AppData%/TokenData.txt", "a") as file:
                     file.write(data)
-                    print("Added access token")
+                    print("Successfully stored access token!")
             else:
                 print(f"A good access token already exists for user: "
                       f"{access_token.user_id}. Did not store access token.")
@@ -68,10 +68,11 @@ def purge_outdated_access_tokens():
             file.truncate()  # Clear file
         with open("%AppData%/TokenData.txt", "a") as file:
             for record in records:
-                expires = datetime.datetime.strptime(record[3], "%Y-%m-%d %H:%M:%S")
-                data = f"{record[0]}; {record[1]}; {record[2]}; " \
-                       f"{record[3]}; {record[4]}; {record[5]}\n"
-                if expires > datetime.datetime.now():  # Add useful tokens only
-                    file.write(data)
+                if len(record) == 6:
+                    expires = datetime.datetime.strptime(record[3], "%Y-%m-%d %H:%M:%S")
+                    data = f"{record[0]}; {record[1]}; {record[2]}; " \
+                           f"{record[3]}; {record[4]}; {record[5]}"
+                    if expires > datetime.datetime.now():  # Add useful tokens only
+                        file.write(data)
     except OSError as osErr:
         print(osErr.errno, osErr.strerror, osErr.filename)

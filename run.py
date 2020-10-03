@@ -21,11 +21,6 @@ def run():
     }
     access_token = AccessToken(name, token_data)
     DataHelper.store_access_token(access_token)
-    if not (access_token is None):
-        print(access_token.user_id, access_token.token, access_token.token_type,
-              access_token.expires_in, access_token.scope)
-    else:
-        print(f"No access tokens found for user: {name}")
     # user = SpotifyUser(name)
     # print(user.access_token)
     # print(user.access_token.token)
