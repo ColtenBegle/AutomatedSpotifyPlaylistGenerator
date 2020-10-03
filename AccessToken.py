@@ -12,3 +12,4 @@ class AccessToken:
         self.token_type = token_data_dict["token_type"]
         self.expires_in = token_data_dict["expires_in"]
         self.refresh_token = token_data_dict["refresh_token"]
+        self.scope = token_data_dict["scope"]
