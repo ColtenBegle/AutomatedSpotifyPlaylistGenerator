@@ -5,8 +5,8 @@ import base64
 import webbrowser
 import os
 import re
+import DataHelper
 from requests.exceptions import HTTPError
-# sites.google.com/view/beglebocolten/home
 
 
 def get_client_id():
@@ -36,6 +36,7 @@ class AuthorizationHelper:
         request_data = self.get_access_token()
         return request_data
 
+
     def get_code_verifier(self):
         code_verifier = base64.urlsafe_b64encode(os.urandom(40)).decode('utf-8')
         code_verifier = re.sub('[^a-zA-Z0-9]+', '', code_verifier)
@@ -53,18 +54,12 @@ class AuthorizationHelper:
         return state
 
     def get_code(self):
-        scopes = json.dumps([
-            "playlist-read-collaborative",
-            "playlist-modify-public",
-            "user-library-modify",
-            "user-top-read",
-            "playlist-read-private",
-            "playlist-modify-private",
-            "user-library-read"
-        ])
+        scopes = "user-library-read user-library-modify playlist-read-collaborative " \
+                 "playlist-modify-private playlist-modify-public playlist-read-private"
+
         query = f"https://accounts.spotify.com/authorize/?client_id={self.client_id}&" \
                 f"response_type=code&redirect_uri={self.redirect_uri}&" \
-                f"code_challenge_method=S256&code_challenge={self.code_challenge}&state={self.state}&scopes={scopes}"
+                f"code_challenge_method=S256&code_challenge={self.code_challenge}&state={self.state}&scope={scopes}"
         try:
             response = requests.get(query)
             webbrowser.open(response.url)

@@ -4,26 +4,34 @@ Description: This program generates playlists from your liked songs based
 on the genre of music using the Spotify Web API
 """
 import datetime
-
+import json
 import DataHelper
 from SpotifyUser import SpotifyUser
 from AccessToken import AccessToken
 
 
+def get_playlist_id(playlist_data, playlist_name):
+    playlists = []
+    items = playlist_data["items"]
+    for playlist in items:
+        playlists.append(playlist)
+    for playlist in playlists:
+        if playlist["name"] == playlist_name:
+            playlist_id = playlist["id"]
+            return playlist_id
+    return -1
+
+
 def run():
-    name = input("Enter your Spotify username: ")
-    token_data = {
-        "access_token": "dasdfjajdfj23203",
-        "token_type": "credential",
-        "expires_in": "2025-10-02 23:59:59",
-        "refresh_token": "dfajslkdjflaksj",
-        "scope": ["Hello", "world"]
-    }
-    access_token = AccessToken(name, token_data)
-    DataHelper.store_access_token(access_token)
+    with open("test.json", "r") as f:
+        playlist_data = json.load(f)
+        playlist_id = get_playlist_id(playlist_data, "Dana")
+        print(playlist_id)
+    # name = input("Enter your Spotify username: ")
     # user = SpotifyUser(name)
-    # print(user.access_token)
-    # print(user.access_token.token)
+    #
+    # user.get_user_playlists()
+    # print(user.playlist_data)
 
 
 if __name__ == '__main__':
