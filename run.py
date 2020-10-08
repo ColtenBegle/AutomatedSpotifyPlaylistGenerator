@@ -8,6 +8,7 @@ import json
 import DataHelper
 from SpotifyUser import SpotifyUser
 from AccessToken import AccessToken
+from UI.Login import karl
 
 
 def get_playlist_id(playlist_data, playlist_name):
@@ -22,7 +23,7 @@ def get_playlist_id(playlist_data, playlist_name):
     return -1
 
 
-def run():
+def main():
     with open("test.json", "r") as f:
         playlist_data = json.load(f)
         playlist_id = get_playlist_id(playlist_data, "Dana")
@@ -35,4 +36,4 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    main()
