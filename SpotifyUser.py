@@ -2,13 +2,27 @@ import json
 import requests
 from AuthorizationHelper import AuthorizationHelper
 from AccessToken import AccessToken
-import base64
-import webbrowser
-import datetime
-import hashlib
-import os
-import re
+import math
 from requests.exceptions import HTTPError
+
+from Playlist import Playlist
+from Song import Song
+
+
+def get_songs(song_data):
+    songs = []
+    dict_songs = json.loads(song_data)
+    items = dict_songs["items"]
+    for item in items:
+        track = item["track"]
+        song_id = track["id"]
+        song_uri = track["uri"]
+        song_name = track["name"]
+        album = track["album"]
+        release_date = album["release_date"]
+        song = Song(song_id, song_uri, song_name, release_date)
+        songs.append(song)
+    return songs
 
 
 class SpotifyUser:
@@ -17,27 +31,29 @@ class SpotifyUser:
     code_challenge = None
     access_token = None
     token_data = None
-    profile_data = None
-    playlist_data = None
     AuthHelper = None
+    playlists = None
 
     def __init__(self, user_id):
         self.user_id = user_id
         self.AuthHelper = AuthorizationHelper()
         self.token_data = self.AuthHelper.authorize()
         self.access_token = AccessToken(user_id, self.token_data)
+        self.playlists = self.get_user_playlists()
 
     def get_user_profile(self):
         query = "https://api.spotify.com/v1/users/{}".format(self.user_id)
         headers = self.get_headers()
         response = requests.get(query, headers=headers)
-        self.profile_data = response.json()
+        return response.json()
 
     def get_user_playlists(self):
         query = "https://api.spotify.com/v1/users/{}/playlists".format(self.user_id)
         headers = self.get_headers()
         response = requests.get(query, headers=headers)
-        self.playlist_data = response.json()
+        playlist_data = json.loads(response.json())
+        playlists = self.get_playlists(playlist_data)
+        return playlists
 
     def get_headers(self):
         return {
@@ -45,41 +61,31 @@ class SpotifyUser:
             "Content-Type": "application/json"
         }
 
-    def create_playlist(self, name, description="", public=True):
-        query = "https://api.spotify.com/v1/users/{}/playlists".format(self.user_id)
-        headers = self.get_headers()
-        request_body = json.dumps({
-            "name": f"{name}",
-            "description": f"{description}",
-            "public": f"{public}"
-        })
-        try:
-            response = requests.post(query, data=request_body, headers=headers)
-            response_data = response.json()
-            return response_data['id']
-        except HTTPError as httpErr:
-            print(httpErr)
-            print(httpErr.strerror)
-            return -1
-        except KeyError as keyErr:
-            print(keyErr.__cause__)
-            return -1
-
-    def get_playlist_id(self, playlist_data, playlist_name):
+    def get_playlists(self, playlist_data):
         playlists = []
         items = playlist_data["items"]
-        for playlist in items:
+        for item in items:
+            playlist_id = item["id"]
+            name = item["name"]
+            description = item["description"]
+            tracks = item["tracks"]
+            track_count = tracks["total"]
+            public = item["public"]
+            songs = self.get_playlist_content(playlist_id, track_count)
+            playlist = Playlist(name, description, track_count, songs, public, playlist_id)
             playlists.append(playlist)
-        for playlist in playlists:
-            if playlist["name"] == playlist_name:
-                playlist_id = playlist["id"]
-                return playlist_id
-        return -1
+        return playlists
 
-    def get_playlist_content(self, playlist_id):
-        query = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
-        headers = self.get_headers()
-        response = requests.get(query, headers=headers)
-        response_json = response.json()
-        return response_json
-
+    def get_playlist_content(self, playlist_id, offset=0):
+        songs = []
+        if offset > 100:
+            times_greater = offset / 100
+            offset = 0
+            for i in range(math.ceil(times_greater)):
+                query = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?offset={offset}"
+                headers = self.get_headers()
+                response = requests.get(query, headers=headers)
+                response_json = response.json()
+                songs += get_songs(response_json)
+                offset += 100
+        return songs
