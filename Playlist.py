@@ -2,14 +2,15 @@ import json
 import math
 import requests
 from requests.exceptions import HTTPError
+from itertools import islice
 
 
 def to_json_array(songs):
-    json_array = "{'uris':"
     song_uris = []
     for song in songs:
         song_uris.append(song.song_uri)
-    json_array += song_uris
+    json_array = json.dumps(song_uris)
+    return json_array
 
 
 class Playlist:
@@ -20,7 +21,7 @@ class Playlist:
     songs = None
     public = None
 
-    def __init__(self, playlist_name, description, track_count=0, songs=None,
+    def __init__(self, playlist_name, description="", track_count=0, songs=None,
                  public=True, playlist_id=None, client=None):
         self.name = playlist_name
         self.description = description
@@ -53,13 +54,34 @@ class Playlist:
             return -1
 
     def add_songs_to_playlist(self, songs, client):
-        if songs > 100:
-            times_greater = songs / 100
-            temp_songs = songs
+        responses = []
+        if len(songs) > 100:
+            times_greater = len(songs) / 100
+            songs_remaining = len(songs)
+            cutoff = 100
+            prev_cutoff = 0
             for i in range(math.ceil(times_greater)):
+                temp_songs = list(islice(songs, prev_cutoff, cutoff))
                 query = f"https://api.spotify.com/v1/playlists/{self.playlist_id}/tracks"
                 headers = client.get_headers()
-                request_body = json.dumps({
-                    "uris": f"{to_json_array()}"
-                })
+                uris = to_json_array(temp_songs)
+                response = requests.post(query, data=uris, headers=headers)
+                response_data = response.json()
+                responses.append(response_data)
+                songs_remaining -= (cutoff - prev_cutoff)
+                if songs_remaining < 100:
+                    prev_cutoff = cutoff
+                    cutoff += songs_remaining
+                else:
+                    prev_cutoff = cutoff
+                    cutoff += 100
+        else:
+            query = f"https://api.spotify.com/v1/playlists/{self.playlist_id}/tracks"
+            headers = client.get_headers()
+            uris = to_json_array(songs)
+            response = requests.post(query, data=uris, headers=headers)
+            response_data = response.json()
+            responses.append(response_data)
+
+        return responses
 

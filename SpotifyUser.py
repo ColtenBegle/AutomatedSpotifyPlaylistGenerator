@@ -51,7 +51,7 @@ class SpotifyUser:
         query = "https://api.spotify.com/v1/users/{}/playlists".format(self.user_id)
         headers = self.get_headers()
         response = requests.get(query, headers=headers)
-        playlist_data = json.loads(response.json())
+        playlist_data = json.loads(response.text)
         playlists = self.get_playlists(playlist_data)
         return playlists
 
@@ -62,7 +62,7 @@ class SpotifyUser:
         }
 
     def get_playlists(self, playlist_data):
-        playlists = []
+        playlists = {}
         items = playlist_data["items"]
         for item in items:
             playlist_id = item["id"]
@@ -73,7 +73,7 @@ class SpotifyUser:
             public = item["public"]
             songs = self.get_playlist_content(playlist_id, track_count)
             playlist = Playlist(name, description, track_count, songs, public, playlist_id)
-            playlists.append(playlist)
+            playlists[name] = playlist
         return playlists
 
     def get_playlist_content(self, playlist_id, offset=0):
@@ -85,7 +85,13 @@ class SpotifyUser:
                 query = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks?offset={offset}"
                 headers = self.get_headers()
                 response = requests.get(query, headers=headers)
-                response_json = response.json()
-                songs += get_songs(response_json)
+                response_data = response.text
+                songs += get_songs(response_data)
                 offset += 100
+        else:
+            query = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
+            headers = self.get_headers()
+            response = requests.get(query, headers=headers)
+            response_data = response.text
+            songs += get_songs(response_data)
         return songs
