@@ -1,12 +1,11 @@
 import json
 import requests
-from AuthorizationHelper import AuthorizationHelper
-from AccessToken import AccessToken
+from API.AuthorizationHelper import AuthorizationHelper
+from API.AccessToken import AccessToken
 import math
-from requests.exceptions import HTTPError
 
-from Playlist import Playlist
-from Song import Song
+from Spotify.Playlist import Playlist
+from Spotify.Song import Song
 
 
 def get_songs(song_data):

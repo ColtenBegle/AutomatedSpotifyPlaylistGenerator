@@ -5,7 +5,6 @@ import base64
 import webbrowser
 import os
 import re
-import DataHelper
 from requests.exceptions import HTTPError
 
 

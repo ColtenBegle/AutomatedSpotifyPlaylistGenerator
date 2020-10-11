@@ -4,13 +4,8 @@ Description: This program generates playlists from your liked songs based
 on the genre of music using the Spotify Web API
 """
 import datetime
-import json
-import DataHelper
-from Playlist import Playlist
-from SpotifyUser import SpotifyUser
-from AccessToken import AccessToken
-from Song import Song
-from itertools import islice
+from Spotify.Playlist import Playlist
+from Spotify.SpotifyUser import SpotifyUser
 
 
 def main():
