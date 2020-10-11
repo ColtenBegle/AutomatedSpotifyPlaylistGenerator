@@ -8,3 +8,5 @@ venv/
 __pycache__/
 ## Ignore .SECRET
 .SECRET
+## Ignore DeveloperClient.py
+DeveloperClient.py

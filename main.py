@@ -59,6 +59,8 @@ def main():
         new_playlist = Playlist("2020's Songs", client=user)
         new_playlist.add_songs_to_playlist(songs_2020s, user)
 
+    print("Finished!")
+
 
 if __name__ == '__main__':
     main()
