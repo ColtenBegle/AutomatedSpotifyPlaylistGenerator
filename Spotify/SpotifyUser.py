@@ -1,7 +1,7 @@
 import json
 import requests
-from API.AuthorizationHelper import AuthorizationHelper
-from API.AccessToken import AccessToken
+from TokenHelper.AuthorizationHelper import AuthorizationHelper
+from TokenHelper.AccessToken import AccessToken
 import math
 
 from Spotify.Playlist import Playlist

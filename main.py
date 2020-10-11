@@ -1,7 +1,7 @@
 """
 Programmer: Colten Begle    Date: 9/10/2020
 Description: This program generates playlists from your liked songs based
-on the genre of music using the Spotify Web API
+on the genre of music using the Spotify Web TokenHelper
 """
 import datetime
 from Spotify.Playlist import Playlist

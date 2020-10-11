@@ -1,5 +1,5 @@
 import datetime
-from API.AccessToken import AccessToken
+from TokenHelper.AccessToken import AccessToken
 
 
 def store_access_token(access_token):
